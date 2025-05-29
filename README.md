@@ -6,8 +6,8 @@
 
 ## 🧭 Table of Contents
 
-- [Games Overview](#games-overview)
-- [Tech Stack](#tech-stack)
+- [Games Overview]
+- [Tech Stack]
 
 ---
 
