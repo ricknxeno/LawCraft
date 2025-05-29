@@ -6,8 +6,8 @@
 
 ## 🧭 Table of Contents
 
-- [Games Overview]
-- [Tech Stack]
+- Games Overview
+- Tech Stack
 
 ---
 
