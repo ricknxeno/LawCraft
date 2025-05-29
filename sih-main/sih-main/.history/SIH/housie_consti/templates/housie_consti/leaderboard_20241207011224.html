@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static '/css/leaderboard.css' %}">
+<div class="historic-container">
+    <h1 class="historic-title">Constitutional Assembly Leaderboard</h1>
+    
+    <!-- Overall Statistics -->
+    <div class="stats-panel">
+        <h2>Assembly Statistics</h2>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <span class="stat-label">Total Members</span>
+                <span class="stat-value">{{ total_players }}</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">Session Duration</span>
+                <span class="stat-value">{{ game_duration|floatformat:0 }} min</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">Articles Covered</span>
+                <span class="stat-value">{{ total_articles }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Player Rankings -->
+    <div class="rankings-panel">
+        <h2>Assembly Member Rankings</h2>
+        <div class="scroll-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>RANK</th>
+                        <th>ASSEMBLY MEMBER</th>
+                        <th>POINTS</th>
+                        <th>CORRECT ANSWERS</th>
+                        <th>AVG RESPONSE TIME</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if players_data %}
+                        {% for player in players_data %}
+                        <tr {% if forloop.first %}class="winner"{% endif %}>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ player.username|default:"Anonymous" }}</td>
+                            <td>{{ player.points|default:"0" }}</td>
+                            <td>{{ player.correct_answers|default:"0" }}</td>
+                            <td>{{ player.avg_response_time|default:"0" }}s</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">No players have completed the game yet.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <a href="{% url 'housie_consti:game_analysis' room.room_id %}" class="action-btn analysis">
+            <span class="btn-icon">📊</span>
+            View Analysis
+        </a>
+        <a href="{% url 'housie_consti:room_detail' room.room_id %}" class="action-btn return">
+            <span class="btn-icon">🔙</span>
+            Return to Room
+        </a>
+        <a href="{% url 'housie_consti:create_room' %}" class="action-btn new-game">
+            <span class="btn-icon">🎮</span>
+            New Game
+        </a>
+    </div>
+</div>
+
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    th {
+        background-color: #8B4513;
+        color: #FFD700;
+        padding: 12px;
+        text-align: center;
+        font-weight: bold;
+    }
+    
+    td {
+        padding: 10px;
+        text-align: center;
+        background-color: #FFEB3B;
+    }
+    
+    .winner td {
+        background-color: #FFF176;
+        font-weight: bold;
+    }
+    
+    .scroll-container {
+        max-height: 400px;
+        overflow-y: auto;
+        margin: 20px 0;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}

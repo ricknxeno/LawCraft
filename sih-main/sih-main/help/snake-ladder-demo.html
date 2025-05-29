@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Snake & Ladder Animation Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            min-height: 100vh;
+            background: #f0f0f0;
+        }
+    </style>
+    <link rel="stylesheet" href="snake-ladder.css">
+</head>
+<body>
+    <div class="main-container">
+        <div class="game-container">
+            <h1>Snake & Ladder Game</h1>
+            <div class="constitution-board">
+                <svg width="600" height="600" viewBox="0 0 600 600">
+                    <defs>
+                        <filter id="shadow">
+                            <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+                        </filter>
+                    </defs>
+                    <g id="boardGrid"></g>
+                    <g id="players"></g>
+                </svg>
+            </div>
+            <button id="rollDice" class="roll-button">Roll Dice</button>
+        </div>
+    </div>
+    <script src="snake-ladder.js"></script>
+</body>
+</html> 

@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8 text-center">Game Analysis Report</h1>
+    
+    <!-- Room Statistics -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Room Statistics</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="p-4 bg-gray-50 rounded-lg">
+                <p class="text-gray-600">Total Players</p>
+                <p class="text-2xl font-bold">{{ analysis.room_stats.total_players }}</p>
+            </div>
+            <div class="p-4 bg-gray-50 rounded-lg">
+                <p class="text-gray-600">Game Duration</p>
+                <p class="text-2xl font-bold">{{ analysis.room_stats.game_duration|floatformat:1 }} minutes</p>
+            </div>
+            <div class="p-4 bg-gray-50 rounded-lg">
+                <p class="text-gray-600">Winner</p>
+                <p class="text-2xl font-bold text-green-600">{{ analysis.room_stats.winner|default:"Game in Progress" }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Player Performance -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Player Performance</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full table-auto">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="px-4 py-2 text-left">Player</th>
+                        <th class="px-4 py-2 text-center">Points</th>
+                        <th class="px-4 py-2 text-center">Selections</th>
+                        <th class="px-4 py-2 text-center">Accuracy</th>
+                        <th class="px-4 py-2 text-center">Avg Response Time</th>
+                        <th class="px-4 py-2 text-center">Achievements</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player, stats in analysis.players.items %}
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-4 py-2">{{ player }}</td>
+                        <td class="px-4 py-2 text-center">{{ stats.total_points }}</td>
+                        <td class="px-4 py-2 text-center">
+                            {{ stats.total_selections }}
+                            {% if stats.wrong_selections > 0 %}
+                            <span class="text-red-500 text-sm">({{ stats.wrong_selections }} wrong)</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-2 text-center">
+                            <div class="flex items-center justify-center">
+                                <div class="w-16 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-600 h-2 rounded-full" style="width: {{ stats.accuracy }}%"></div>
+                                </div>
+                                <span class="ml-2">{{ stats.accuracy }}%</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-2 text-center">{{ stats.avg_response_time }}s</td>
+                        <td class="px-4 py-2">
+                            <div class="flex flex-wrap gap-1 justify-center">
+                                {% for achievement in stats.achievements %}
+                                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">
+                                    {{ achievement }}
+                                </span>
+                                {% endfor %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- AI Analysis Reports -->
+    {% for player, stats in analysis.players.items %}
+        {% if stats.ai_reports %}
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-2xl font-semibold mb-4">AI Analysis Report for {{ player }}</h2>
+                {% for report in stats.ai_reports %}
+                    <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                        <h3 class="text-xl font-semibold mb-2">Case: {{ report.case_title }}</h3>
+                        <div class="mb-2">
+                            <span class="text-red-600 font-semibold">Selected Article:</span> {{ report.selected_article }}
+                        </div>
+                        <div class="mb-4">
+                            <span class="text-green-600 font-semibold">Correct Article:</span> {{ report.correct_article }}
+                        </div>
+                        <div class="prose max-w-none">
+                            {{ report.analysis }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+{% endblock %} 

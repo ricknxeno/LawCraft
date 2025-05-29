@@ -1,0 +1,128 @@
+.main-container {
+    background: linear-gradient(45deg, #e6d5a7, #f3e5c0);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+.game-container {
+    background: linear-gradient(45deg, #fff9e6, #f8f2e2);
+    border: 12px solid #8b4513;
+    border-radius: 12px;
+    box-shadow: 
+        0 0 0 4px #654321,
+        0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 2rem;
+    text-align: center;
+}
+
+h1 {
+    color: #8b4513;
+    margin-bottom: 1rem;
+    font-family: 'Crimson Text', serif;
+}
+
+.constitution-board {
+    background: linear-gradient(45deg, #f3e5c0, #e6d5a7);
+    border-radius: 8px;
+    position: relative;
+    width: 600px;
+    height: 600px;
+    margin: 0 auto 1rem;
+}
+
+.board-cell {
+    fill: #fff9e6;
+    stroke: #8b4513;
+    stroke-width: 1;
+}
+
+.cell-number {
+    font-family: 'Crimson Text', serif;
+    font-size: 14px;
+    fill: #8b4513;
+    user-select: none;
+}
+
+.snake-body {
+    fill: none;
+    stroke: #2d5a3a;
+    stroke-width: 30;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.ladder {
+    stroke: #8B4513;
+    stroke-width: 6;
+    stroke-linecap: round;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.ladder-rung {
+    stroke: #A0522D;
+    stroke-width: 4;
+    stroke-linecap: round;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+}
+
+.player-token {
+    fill: #4a90e2;
+    stroke: #357abd;
+    stroke-width: 2;
+    filter: url(#shadow);
+    transition: transform 0.5s ease, cx 0.5s ease, cy 0.5s ease;
+}
+
+.roll-button {
+    background: linear-gradient(45deg, #8b4513, #654321);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'Crimson Text', serif;
+    font-size: 1.2rem;
+    padding: 0.8rem 1.6rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.roll-button:hover {
+    background: linear-gradient(45deg, #654321, #8b4513);
+}
+
+.snake-cell {
+    fill: #ffebee !important; /* Light red for snake cells */
+}
+
+.ladder-cell {
+    fill: #e8f5e9 !important; /* Light green for ladder cells */
+}
+
+.snake-head {
+    fill: #2d5a3a;
+    stroke: #1a472a;
+    stroke-width: 2;
+}
+
+.snake-tongue {
+    fill: none;
+    stroke: #ff3366;
+    stroke-width: 2;
+    animation: flickerTongue 1s ease-in-out infinite;
+}
+
+.climber {
+    fill: #4a90e2;
+    stroke: #357abd;
+    stroke-width: 2;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+@keyframes flickerTongue {
+    0% { transform: scaleX(1) translateX(0); }
+    50% { transform: scaleX(1.2) translateX(2px); }
+    100% { transform: scaleX(1) translateX(0); }
+} 

@@ -1,0 +1,636 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    {% block extra_head %}{% endblock %}
+    <style>
+        .message {
+            color: #f4e4bc;
+            margin-bottom: 1rem;
+            font-family: 'Crimson Text', serif;
+        }
+        .user-message {
+            margin-left: 20%;
+            background-color: #8B4513;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #4A2511;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .ai-message {
+            margin-right: 20%;
+            background-color: #6B3410;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #4A2511;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        #chat-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        #chat-container::-webkit-scrollbar-track {
+            background: #8B4513;
+            border-radius: 4px;
+        }
+        #chat-container::-webkit-scrollbar-thumb {
+            background: #4A2511;
+            border-radius: 4px;
+            border: 1px solid #f4e4bc;
+        }
+        #chat-window {
+            background-image: url('/static/images/parchment-bg.jpg');
+            background-size: cover;
+            border: 2px solid #8B4513;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        #chat-toggle {
+            background-color: #8B4513;
+            border: 2px solid #4A2511;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            color: #f4e4bc;
+            transition: transform 0.2s;
+        }
+        #chat-toggle:hover {
+            transform: scale(1.05);
+            background-color: #6B3410;
+        }
+        #user-input {
+            background-color: #f4e4bc;
+            border: 1px solid #8B4513;
+            color: #4A2511;
+        }
+        #user-input::placeholder {
+            color: #8B4513;
+            opacity: 0.7;
+        }
+        #chat-minimize {
+            color: #4A2511;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        #chat-minimize:hover {
+            opacity: 1;
+        }
+        .chat-header {
+            background-color: #8B4513;
+            border-bottom: 2px solid #4A2511;
+            color: #f4e4bc;
+        }
+        .nav-bar {
+            padding: 1rem;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(1px);
+            border-bottom: 2px solid rgba(139, 69, 19, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .nav-bar:hover {
+            ackdrop-filter: blur(1px);
+            border-bottom: 2px solid rgba(139, 69, 19, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+        }
+       
+        .logo-image {
+            height: 200px;
+            width: auto;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+            position: absolute;
+        }
+
+        .logo:hover .logo-image {
+            transform: scale(1.05);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #4A2511;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            position: relative;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: #8B4513;
+            left: 0;
+            bottom: -2px;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #8B4513;
+            transform: translateY(-2px);
+        }
+
+        .nav-link:hover:after {
+            width: 100%;
+        }
+
+        .nav-link.active {
+            color: #8B4513;
+            font-weight: 600;
+        }
+
+        .nav-link.active:after {
+            width: 100%;
+            background: #8B4513;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: rgba(255, 255, 255, 0.98);
+            min-width: 160px;
+            border: 1px solid rgba(139, 69, 19, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 8px 0;
+            z-index: 1000;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content a {
+            color: #4A2511;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+
+        .dropdown-content a:hover {
+            background: rgba(139, 69, 19, 0.05);
+            color: #8B4513;
+            padding-left: 24px;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+        }
+
+        .menu-bar {
+            width: 25px;
+            height: 2px;
+            background-color: #8B4513;
+            margin: 5px 0;
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: flex;
+                flex-direction: column;
+                cursor: pointer;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.98);
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+                border-bottom: 2px solid rgba(139, 69, 19, 0.1);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .dropdown-content {
+                position: static;
+                box-shadow: none;
+                border: none;
+                background: transparent;
+                min-width: 100%;
+            }
+
+            .dropdown-content a {
+                padding-left: 20px;
+            }
+        }
+
+        body {
+            padding-top: 80px;
+        }
+
+        /* Global cursor style for the entire platform */
+        * {
+            cursor: auto !important;
+        }
+
+        /* Different states of cursor if needed */
+        a:hover, button:hover, .clickable:hover {
+            cursor: pointer !important;
+        }
+
+        /* For text input areas */
+        input[type="text"], 
+        input[type="email"], 
+        textarea {
+            cursor: text;  /* Keep default text cursor for input fields */
+        }
+
+        #google_translate_element {
+        position: fixed !important;
+        visibility: hidden !important;
+        display: block !important;
+        height: 0 !important;
+        width: 0 !important;
+        overflow: hidden !important;
+        opacity: 0 !important;
+    }
+
+    /* Hide Google top bar and branding */
+    .goog-te-banner-frame,
+    .skiptranslate,
+    .goog-te-gadget-simple,
+    .goog-te-gadget-simple > span,
+    .goog-te-menu-value,
+    .goog-tooltip,
+    .goog-tooltip:hover,
+    .goog-logo-link {
+        display: none !important;
+    }
+
+    .goog-te-gadget {
+        height: 0 !important;
+        position: absolute !important;
+        visibility: hidden !important;
+    }
+
+    /* Remove the top margin that Google Translate adds to the body */
+    body {
+        top: 0 !important;
+        position: static !important;
+    }
+
+    /* Style our custom language dropdown */
+    .language-dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .language-dropdown .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .language-dropdown .nav-link:after {
+        content: '▼';
+        font-size: 0.8em;
+    }
+
+    .language-dropdown .dropdown-content {
+        max-height: 400px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+    }
+
+    .language-dropdown .dropdown-content::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .language-dropdown .dropdown-content::-webkit-scrollbar-track {
+        background: rgba(139, 69, 19, 0.05);
+    }
+
+    .language-dropdown .dropdown-content::-webkit-scrollbar-thumb {
+        background: rgba(139, 69, 19, 0.2);
+        border-radius: 3px;
+    }
+
+    /* Hide Google's iframe */
+    iframe.goog-te-menu-frame {
+        display: none !important;
+    }
+
+    /* Remove any residual Google elements */
+    .VIpgJd-ZVi9od-l4eHX-hSRGPd,
+    .VIpgJd-ZVi9od-ORHb,
+    .VIpgJd-ZVi9od-SmfZ,
+    .VIpgJd-ZVi9od-xl07Ob,
+    .VIpgJd-ZVi9od-vH1Gmf,
+    .goog-te-spinner-pos,
+    .goog-te-spinner {
+        display: none !important;
+    }
+
+    </style>
+    <script type="text/javascript">
+        let translateInitialized = false;
+
+        function googleTranslateElementInit() {
+            console.log('Initializing Google Translate...');
+            new google.translate.TranslateElement(
+                {
+                    pageLanguage: 'en',
+                    includedLanguages: 'en,hi,bn,gu,kn,ml,mr,pa,ta,te,ur',
+                    layout: google.translate.TranslateElement.FloatPosition.TOP_LEFT,
+                    multilanguagePage: true,
+                    gaTrack: false
+                },
+                'google_translate_element'
+            );
+            
+            // Check for initialization
+            checkForTranslateElement();
+        }
+
+        function checkForTranslateElement() {
+            console.log('Checking for translate element...');
+            const select = document.querySelector('.goog-te-combo');
+            
+            if (select) {
+                console.log('Translate element found!');
+                translateInitialized = true;
+                // Hide the Google Translate widget but keep it functional
+                const widget = document.querySelector('.goog-te-gadget');
+                if (widget) {
+                    widget.style.fontSize = '0';
+                    widget.style.color = 'transparent';
+                }
+            } else {
+                console.log('Translate element not found, retrying...');
+                setTimeout(checkForTranslateElement, 1000);
+            }
+        }
+
+        function translateTo(lang) {
+            console.log(`Attempting to translate to: ${lang}`);
+            
+            function doTranslate() {
+                const select = document.querySelector('.goog-te-combo');
+                if (select) {
+                    console.log('Found translate element, current value:', select.value);
+                    select.value = lang;
+                    select.dispatchEvent(new Event('change'));
+                    return true;
+                }
+                return false;
+            }
+
+            if (!doTranslate()) {
+                console.log('Translation element not ready, retrying...');
+                setTimeout(() => translateTo(lang), 1000);
+            }
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <style>
+        /* Hide but keep functional */
+        #google_translate_element {
+            position: fixed;
+            top: -1000px;
+            left: -1000px;
+        }
+
+        .goog-te-banner-frame {
+            display: none !important;
+        }
+
+        .goog-te-gadget {
+            font-size: 0 !important;
+        }
+
+        .goog-te-gadget > span {
+            display: none !important;
+        }
+
+        .goog-te-gadget .goog-te-combo {
+            margin: 0 !important;
+        }
+
+        body {
+            top: 0 !important;
+        }
+
+        .goog-tooltip {
+            display: none !important;
+        }
+
+        .goog-tooltip:hover {
+            display: none !important;
+        }
+
+        .goog-text-highlight {
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div id="google_translate_element"></div>
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="{% static 'images/logo.png' %}" alt="Samvidhan Logo" class="logo-image">
+            </div>
+            <div class="mobile-menu-btn">
+                <div class="menu-bar"></div>
+                <div class="menu-bar"></div>
+                <div class="menu-bar"></div>
+            </div>
+            <div class="nav-links">
+                <a href="{% url 'landing_page' %}" class="nav-link {% if request.resolver_match.url_name == 'landing_page' %}active{% endif %}">Home</a>
+                <div class="dropdown">
+                    <a href="#" style="cursor: pointer;" class="nav-link">Learn</a>
+                    <div class="dropdown-content">
+                        <a href="{% url 'users:learn' %}">Timeline</a>
+                        <a href="{% url 'users:case_study' %}">Case Studies</a>
+                    </div>
+                </div>
+                <a href="{% url 'users:game_library' %}" class="nav-link {% if request.resolver_match.url_name == 'game_library' %}active{% endif %}">Games</a>
+                <a href="{% url 'plat:profile' %}" class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">Profile</a>
+                <a href="{% url 'plat:leaderboard' %}" class="nav-link {% if request.resolver_match.url_name == 'leaderboard' %}active{% endif %}">Leaderboard</a>
+                
+                <!-- Add the translate dropdown -->
+                <div class="dropdown">
+                    <a href="#" class="nav-link">Select Language</a>
+                    <div class="dropdown-content">
+                        <a href="javascript:void(0)" onclick="translateTo('en')">English</a>
+                        <a href="javascript:void(0)" onclick="translateTo('hi')">हिंदी</a>
+                        <a href="javascript:void(0)" onclick="translateTo('bn')">বাংলা</a>
+                        <a href="javascript:void(0)" onclick="translateTo('gu')">ગુજરાતી</a>
+                        <a href="javascript:void(0)" onclick="translateTo('kn')">ಕನ್ನಡ</a>
+                        <a href="javascript:void(0)" onclick="translateTo('ml')">മലയാളം</a>
+                        <a href="javascript:void(0)" onclick="translateTo('mr')">मराठी</a>
+                        <a href="javascript:void(0)" onclick="translateTo('pa')">ਪੰਜਾਬੀ</a>
+                        <a href="javascript:void(0)" onclick="translateTo('ta')">தமிழ்</a>
+                        <a href="javascript:void(0)" onclick="translateTo('te')">తెలుగు</a>
+                        <a href="javascript:void(0)" onclick="translateTo('ur')">اردو</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    {% block content %}{% endblock %}
+    {% load chat_widget %}
+    {% chat_widget %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatToggle = document.getElementById('chat-toggle');
+            const chatWindow = document.getElementById('chat-window');
+            const chatMinimize = document.getElementById('chat-minimize');
+            const chatForm = document.getElementById('chat-form');
+            const chatContainer = document.getElementById('chat-container');
+            const userInput = document.getElementById('user-input');
+
+            // Check if elements exist before adding event listeners
+            if (!chatToggle || !chatWindow || !chatMinimize || !chatForm || !chatContainer || !userInput) {
+                console.error('Required chat elements not found');
+                return;
+            }
+
+            chatToggle.addEventListener('click', () => {
+                chatWindow.classList.toggle('hidden');
+                if (!chatWindow.classList.contains('hidden')) {
+                    userInput.focus();
+                }
+            });
+
+            chatMinimize.addEventListener('click', () => {
+                chatWindow.classList.add('hidden');
+            });
+
+            chatForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const question = userInput.value.trim();
+                if (!question) return;
+
+                // Add user message
+                appendMessage('user', question);
+                userInput.value = '';
+
+                // Show loading
+                const loadingId = appendMessage('ai', 'Thinking...');
+
+                try {
+                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                    const response = await fetch('/chat/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRFToken': csrfToken
+                        },
+                        body: JSON.stringify({ question: question })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    
+                    // Remove loading message
+                    const loadingMsg = document.getElementById(loadingId);
+                    if (loadingMsg) {
+                        loadingMsg.remove();
+                    }
+                    if (data.answer) {
+                        appendMessage('ai', data.answer);
+                    } else {
+                        throw new Error('No answer in response');
+                    }
+
+                } catch (error) {
+                    console.error('Chat error:', error);
+                    const loadingMsg = document.getElementById(loadingId);
+                    if (loadingMsg) {
+                        loadingMsg.remove();
+                    }
+                    appendMessage('ai', 'Sorry, I encountered an error. Please try again in a moment.');
+                }
+            });
+
+            function appendMessage(type, content) {
+                const messageId = 'msg-' + Date.now();
+                const messageDiv = document.createElement('div');
+                messageDiv.id = messageId;
+                messageDiv.className = `message ${type}-message`;
+                
+                if (type === 'user') {
+                    messageDiv.innerHTML = `<strong>You:</strong><br>${content}`;
+                } else {
+                    let formattedContent = content
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                        .replace(/•(.*?)(?=(\n|$))/g, '<li>$1</li>')
+                        .replace(/\n\n/g, '<br><br>');
+                    
+                    messageDiv.innerHTML = formattedContent;
+                }
+                
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                return messageId;
+            }
+
+            // Enable enter key to submit
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    chatForm.dispatchEvent(new Event('submit'));
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
