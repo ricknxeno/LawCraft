@@ -34,9 +34,7 @@ SECRET_KEY = 'django-insecure-*#izk!1jb67jxrqomqu&^u-(w(q7#&_&k6ju53lru2td^-1ue=
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '*',  # Not recommended for production
-    ' https://4dc3-112-133-211-54.ngrok-free.app',  # Add your specific ngrok domain
-]
+    '*']  # Not recommended for production
 
 
 # Application definition
@@ -88,6 +86,7 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -171,6 +170,8 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICSTORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 
 # Media files (Uploaded files)
 MEDIA_URL = '/media/'
