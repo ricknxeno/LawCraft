@@ -1,6 +1,7 @@
 import requests
 import time
 import logging
+import os
 from datetime import datetime
 
 # Configure logging
@@ -13,8 +14,8 @@ logging.basicConfig(
     ]
 )
 
-# Your Render app URL
-APP_URL = "https://lawcraft-8f7u.onrender.com/"
+# Get app URL from environment variable or use default
+APP_URL = os.environ.get("RENDER_APP_URL", "https://lawcraft-8f7u.onrender.com")
 
 # Interval between requests (13 minutes in seconds)
 INTERVAL = 13 * 60
