@@ -1,3 +1,4 @@
 web: gunicorn HackVortex.wsgi --log-file - 
 #or works good with external database
 web: python manage.py migrate && gunicorn HackVortex.wsgi
+worker: python keep_alive.py
