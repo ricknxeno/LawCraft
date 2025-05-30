@@ -204,6 +204,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'http://127.0.0.1:8000',
     'https://4dc3-112-133-211-54.ngrok-free.app',  # Update with your specific ngrok domain
+    'https://lawcraft-8f7u.onrender.com',
+    'https://lawcraft-icbf.onrender.com',  # Add your new Render domain
   # Include both http and https
 ]
 
